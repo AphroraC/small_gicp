@@ -1,4 +1,6 @@
 #ifdef BUILD_WITH_TBB
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <small_gicp/benchmark/benchmark_odom.hpp>
 
@@ -14,7 +16,7 @@ namespace small_gicp {
 class SmallGICPFlowEstimationTBB : public OdometryEstimation {
 public:
   struct InputFrame {
-    using Ptr = std::shared_ptr<InputFrame>;
+    using Ptr = boost::shared_ptr<InputFrame>;
     size_t id;                         // Frame sequential ID
     PointCloud::Ptr points;            // Input point cloud
     KdTree<PointCloud>::Ptr kdtree;    // KdTree for the input point cloud
@@ -61,7 +63,7 @@ public:
     tbb::flow::function_node<InputFrame::Ptr, InputFrame::Ptr> preprocess_node(graph, tbb::flow::unlimited, [&](const InputFrame::Ptr& input) {
       input->sw.start();
       input->points = voxelgrid_sampling(*input->points, params.downsampling_resolution);  // Downsampling
-      input->kdtree = std::make_shared<KdTree<PointCloud>>(input->points);                 // KdTree construction
+      input->kdtree = boost::make_shared<KdTree<PointCloud>>(input->points);               // KdTree construction
       estimate_covariances(*input->points, *input->kdtree, params.num_neighbors);          // Covariance estimation
       return input;
     });
@@ -176,7 +178,7 @@ private:
 };
 
 static auto small_gicp_tbb_flow_registry =
-  register_odometry("small_gicp_tbb_flow", [](const OdometryEstimationParams& params) { return std::make_shared<SmallGICPFlowEstimationTBB>(params); });
+  register_odometry("small_gicp_tbb_flow", [](const OdometryEstimationParams& params) { return boost::make_shared<SmallGICPFlowEstimationTBB>(params); });
 
 }  // namespace small_gicp
 

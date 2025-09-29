@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024 Kenji Koide
 // SPDX-License-Identifier: MIT
 #pragma once
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <atomic>
 #include <memory>
@@ -23,9 +25,9 @@ namespace small_gicp {
 /// @param leaf_size  Downsampling resolution
 /// @return           Downsampled points
 template <typename InputPointCloud, typename OutputPointCloud = InputPointCloud>
-std::shared_ptr<OutputPointCloud> voxelgrid_sampling_tbb(const InputPointCloud& points, double leaf_size) {
+boost::shared_ptr<OutputPointCloud> voxelgrid_sampling_tbb(const InputPointCloud& points, double leaf_size) {
   if (traits::size(points) == 0) {
-    return std::make_shared<OutputPointCloud>();
+    return boost::make_shared<OutputPointCloud>();
   }
 
   const double inv_leaf_size = 1.0 / leaf_size;
@@ -57,7 +59,7 @@ std::shared_ptr<OutputPointCloud> voxelgrid_sampling_tbb(const InputPointCloud& 
   // Sort by voxel coords
   tbb::parallel_sort(coord_pt, [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
 
-  auto downsampled = std::make_shared<OutputPointCloud>();
+  auto downsampled = boost::make_shared<OutputPointCloud>();
   traits::resize(*downsampled, traits::size(points));
 
   // Take block-wise sum

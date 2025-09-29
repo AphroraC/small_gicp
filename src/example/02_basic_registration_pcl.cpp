@@ -7,7 +7,7 @@
 #include <small_gicp/pcl/pcl_registration.hpp>
 #include <small_gicp/util/downsampling_omp.hpp>
 #include <small_gicp/benchmark/read_points.hpp>
-
+#include <boost/make_shared.hpp>
 using namespace small_gicp;
 
 /// @brief Example of using RegistrationPCL that can be used as a drop-in replacement for pcl::GeneralizedIterativeClosestPoint.
@@ -56,8 +56,8 @@ void example2(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& raw_target, const 
   estimate_covariances_omp(*source, num_neighbors, num_threads);
 
   // Create KdTree for target and source.
-  auto target_tree = std::make_shared<KdTree<pcl::PointCloud<pcl::PointCovariance>>>(target, KdTreeBuilderOMP(num_threads));
-  auto source_tree = std::make_shared<KdTree<pcl::PointCloud<pcl::PointCovariance>>>(source, KdTreeBuilderOMP(num_threads));
+  auto target_tree = boost::make_shared<KdTree<pcl::PointCloud<pcl::PointCovariance>>>(target, KdTreeBuilderOMP(num_threads));
+  auto source_tree = boost::make_shared<KdTree<pcl::PointCloud<pcl::PointCovariance>>>(source, KdTreeBuilderOMP(num_threads));
 
   Registration<GICPFactor, ParallelReductionOMP> registration;
   registration.reduction.num_threads = num_threads;

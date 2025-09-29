@@ -1,5 +1,5 @@
 #ifdef BUILD_WITH_PCL
-
+#include <boost/make_shared.hpp>
 #include <small_gicp/benchmark/benchmark_odom.hpp>
 
 #include <pcl/point_types.h>
@@ -56,7 +56,7 @@ private:
   Eigen::Isometry3d T;
 };
 
-static auto pcl_odom_registry = register_odometry("pcl", [](const OdometryEstimationParams& params) { return std::make_shared<PCLOnlineOdometryEstimation>(params); });
+static auto pcl_odom_registry = register_odometry("pcl", [](const OdometryEstimationParams& params) { return boost::make_shared<PCLOnlineOdometryEstimation>(params); });
 
 }  // namespace small_gicp
 

@@ -2,6 +2,8 @@
 #include <small_gicp/points/point_cloud.hpp>
 #include <small_gicp/benchmark/benchmark.hpp>
 #include <small_gicp/benchmark/benchmark_odom.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 int main(int argc, char** argv) {
   using namespace small_gicp;
@@ -64,7 +66,7 @@ int main(int argc, char** argv) {
   std::cout << "voxel_resolution=" << params.voxel_resolution << std::endl;
   std::cout << "visualize=" << params.visualize << std::endl;
 
-  std::shared_ptr<OdometryEstimation> odom = create_odometry(engine, params);
+  boost::shared_ptr<OdometryEstimation> odom = create_odometry(engine, params);
   if (odom == nullptr) {
     return 1;
   }

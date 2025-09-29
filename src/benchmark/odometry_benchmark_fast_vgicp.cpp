@@ -1,5 +1,5 @@
 #ifdef BUILD_WITH_FAST_GICP
-
+#include <boost/make_shared.hpp>
 #include <small_gicp/benchmark/benchmark_odom.hpp>
 
 #include <pcl/point_types.h>
@@ -62,7 +62,7 @@ private:
   Eigen::Isometry3d T;
 };
 
-static auto fast_vgicp_registry = register_odometry("fast_vgicp", [](const OdometryEstimationParams& params) { return std::make_shared<FastVGICPOdometryEstimation>(params); });
+static auto fast_vgicp_registry = register_odometry("fast_vgicp", [](const OdometryEstimationParams& params) { return boost::make_shared<FastVGICPOdometryEstimation>(params); });
 
 }  // namespace small_gicp
 

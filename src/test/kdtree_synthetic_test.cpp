@@ -5,12 +5,14 @@
 #include <small_gicp/ann/kdtree.hpp>
 #include <small_gicp/ann/kdtree_omp.hpp>
 #include <small_gicp/ann/kdtree_tbb.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 using namespace small_gicp;
 
 struct Problem {
-  using Ptr = std::shared_ptr<Problem>;
-  using ConstPtr = std::shared_ptr<const Problem>;
+  using Ptr = boost::shared_ptr<Problem>;
+  using ConstPtr = boost::shared_ptr<const Problem>;
 
   std::string target_name;
   std::string query_name;
@@ -33,13 +35,13 @@ public:
     auto udist = std::uniform_real_distribution<>(-1.0, 1.0);
     std::generate(points.begin(), points.end(), [&]() { return Eigen::Vector4d(udist(mt), udist(mt), udist(mt), 1.0); });
     names.emplace_back("r[-1.0, 1.0]");
-    targets.emplace_back(std::make_shared<PointCloud>(points));
+    targets.emplace_back(boost::make_shared<PointCloud>(points));
 
     // Uniform real with a wide band [-1e6, 1e6]
     udist = std::uniform_real_distribution<>(-1e6, 1e6);
     std::generate(points.begin(), points.end(), [&]() { return Eigen::Vector4d(udist(mt), udist(mt), udist(mt), 1.0); });
     names.emplace_back("r[-1e6, 1e6]");
-    targets.emplace_back(std::make_shared<PointCloud>(points));
+    targets.emplace_back(boost::make_shared<PointCloud>(points));
 
     // Two separate uniform real distributions [-1.0, -0.5] + [0.5, 1.0]
     auto udist_l = std::uniform_real_distribution<>(-1.0, -0.5);
@@ -47,29 +49,29 @@ public:
     std::generate(points.begin(), points.begin() + points.size() / 2, [&]() { return Eigen::Vector4d(udist_l(mt), udist_l(mt), udist_l(mt), 1.0); });
     std::generate(points.begin() + points.size() / 2, points.end(), [&]() { return Eigen::Vector4d(udist_r(mt), udist_r(mt), udist_r(mt), 1.0); });
     names.emplace_back("r[-1.0, -0.5]+R[0.5, 1.0]");
-    targets.emplace_back(std::make_shared<PointCloud>(points));
+    targets.emplace_back(boost::make_shared<PointCloud>(points));
 
     // Uniform integer [-3, 3]
     auto idist = std::uniform_int_distribution<>(-3, 3);
     std::generate(points.begin(), points.end(), [&]() { return Eigen::Vector4d(idist(mt), idist(mt), idist(mt), 1.0); });
     names.emplace_back("i[-3, 3]");
-    targets.emplace_back(std::make_shared<PointCloud>(points));
+    targets.emplace_back(boost::make_shared<PointCloud>(points));
 
     // Normal distribution (mean=0.0, std=1.0)
     auto ndist = std::normal_distribution<>(0.0, 1.0);
     std::generate(points.begin(), points.end(), [&]() { return Eigen::Vector4d(idist(mt), idist(mt), idist(mt), 1.0); });
     names.emplace_back("n(0.0,1.0)");
-    targets.emplace_back(std::make_shared<PointCloud>(points));
+    targets.emplace_back(boost::make_shared<PointCloud>(points));
 
     const int N = targets.size();
     for (int i = 0; i < N; i++) {
       // Create point sets with fewer points
-      auto points = std::make_shared<PointCloud>(targets[i]->points);
+      auto points = boost::make_shared<PointCloud>(targets[i]->points);
       points->resize(10);
       names.emplace_back(names[i] + "(10pts)");
       targets.emplace_back(points);
 
-      points = std::make_shared<PointCloud>(targets[i]->points);
+      points = boost::make_shared<PointCloud>(targets[i]->points);
       points->resize(5);
       names.emplace_back(names[i] + "(5pts)");
       targets.emplace_back(points);
@@ -78,7 +80,7 @@ public:
     // Generate problems and groundtruth
     for (int i = 0; i < targets.size(); i++) {
       for (int j = 0; j < targets.size(); j++) {
-        auto problem = std::make_shared<Problem>();
+        auto problem = boost::make_shared<Problem>();
         problem->target_name = names[i];
         problem->query_name = names[j];
         problem->target = targets[i];
@@ -196,7 +198,7 @@ protected:
   std::vector<std::string> names;
   std::vector<PointCloud::Ptr> targets;
 
-  std::vector<std::shared_ptr<Problem>> problems;
+  std::vector<boost::shared_ptr<Problem>> problems;
 };
 
 // Check if the data is synthesized correctly
@@ -227,14 +229,14 @@ TEST_P(KdTreeSyntheticTest, KnnTest) {
     KdTree<PointCloud, NormalProjection>::Ptr kdtree_normal;
 
     if (method == "SMALL") {
-      kdtree = std::make_shared<KdTree<PointCloud>>(prob->target);
-      kdtree_normal = std::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target);
+      kdtree = boost::make_shared<KdTree<PointCloud>>(prob->target);
+      kdtree_normal = boost::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target);
     } else if (method == "TBB") {
-      kdtree = std::make_shared<KdTree<PointCloud>>(prob->target, KdTreeBuilderTBB());
-      kdtree_normal = std::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target, KdTreeBuilderTBB());
+      kdtree = boost::make_shared<KdTree<PointCloud>>(prob->target, KdTreeBuilderTBB());
+      kdtree_normal = boost::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target, KdTreeBuilderTBB());
     } else if (method == "OMP") {
-      kdtree = std::make_shared<KdTree<PointCloud>>(prob->target, KdTreeBuilderOMP());
-      kdtree_normal = std::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target, KdTreeBuilderOMP());
+      kdtree = boost::make_shared<KdTree<PointCloud>>(prob->target, KdTreeBuilderOMP());
+      kdtree_normal = boost::make_shared<KdTree<PointCloud, NormalProjection>>(prob->target, KdTreeBuilderOMP());
     }
 
     std::vector<int> ks = {1, 2, 3, 5, 10, 20};

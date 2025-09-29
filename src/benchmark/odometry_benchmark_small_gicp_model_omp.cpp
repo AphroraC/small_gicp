@@ -6,7 +6,7 @@
 #include <small_gicp/util/normal_estimation_omp.hpp>
 #include <small_gicp/registration/reduction_omp.hpp>
 #include <small_gicp/registration/registration.hpp>
-
+#include <boost/make_shared.hpp>
 namespace small_gicp {
 
 class SmallGICPModelOnlineOdometryEstimationOMP : public OnlineOdometryEstimation {
@@ -23,7 +23,7 @@ public:
 
     if (voxelmap == nullptr) {
       // This is the very first frame
-      voxelmap = std::make_shared<IncrementalVoxelMap<FlatContainerCov>>(params.voxel_resolution);
+      voxelmap = boost::make_shared<IncrementalVoxelMap<FlatContainerCov>>(params.voxel_resolution);
       voxelmap->insert(*points);
       return T_world_lidar;
     }
@@ -61,6 +61,6 @@ private:
 };
 
 static auto small_gicp_model_omp_registry =
-  register_odometry("small_gicp_model_omp", [](const OdometryEstimationParams& params) { return std::make_shared<SmallGICPModelOnlineOdometryEstimationOMP>(params); });
+  register_odometry("small_gicp_model_omp", [](const OdometryEstimationParams& params) { return boost::make_shared<SmallGICPModelOnlineOdometryEstimationOMP>(params); });
 
 }  // namespace small_gicp

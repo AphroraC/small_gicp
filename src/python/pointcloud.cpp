@@ -9,21 +9,23 @@
 #include <pybind11/functional.h>
 
 #include <small_gicp/points/point_cloud.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 namespace py = pybind11;
 using namespace small_gicp;
 
 void define_pointcloud(py::module& m) {
   // PointCloud
-  py::class_<PointCloud, std::shared_ptr<PointCloud>>(m, "PointCloud")  //
+  py::class_<PointCloud, boost::shared_ptr<PointCloud>>(m, "PointCloud")  //
     .def(
       py::init([](const Eigen::MatrixXd& points) {
         if (points.cols() != 3 && points.cols() != 4) {
           std::cerr << "points must be Nx3 or Nx4" << std::endl;
-          return std::make_shared<PointCloud>();
+          return boost::make_shared<PointCloud>();
         }
 
-        auto pc = std::make_shared<PointCloud>();
+        auto pc = boost::make_shared<PointCloud>();
         pc->resize(points.rows());
         if (points.cols() == 3) {
           for (size_t i = 0; i < points.rows(); i++) {

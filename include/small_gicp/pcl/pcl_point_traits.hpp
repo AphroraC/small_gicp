@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024 Kenji Koide
 // SPDX-License-Identifier: MIT
 #pragma once
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -13,7 +15,7 @@ namespace traits {
 
 template <typename PointType>
 struct Traits<pcl::PointCloud<PointType>> {
-  static_assert(std::is_same_v<pcl::shared_ptr<void>, std::shared_ptr<void>>, "Old PCL version detected. Please update PCL to 1.11 or later.");
+  static_assert(std::is_same_v<pcl::shared_ptr<void>, boost::shared_ptr<void>>, "Old PCL version detected. Please update PCL to 1.11 or later.");
 
   using Points = pcl::PointCloud<PointType>;
 

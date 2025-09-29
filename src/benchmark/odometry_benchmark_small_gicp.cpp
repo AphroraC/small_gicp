@@ -6,7 +6,7 @@
 #include <small_gicp/util/normal_estimation.hpp>
 #include <small_gicp/registration/reduction.hpp>
 #include <small_gicp/registration/registration.hpp>
-
+#include <boost/make_shared.hpp>
 namespace small_gicp {
 
 class SmallGICPOnlineOdometryEstimation : public OnlineOdometryEstimation {
@@ -17,7 +17,7 @@ public:
     Stopwatch sw;
     sw.start();
 
-    auto tree = std::make_shared<KdTree<PointCloud>>(points);
+    auto tree = boost::make_shared<KdTree<PointCloud>>(points);
     estimate_covariances(*points, *tree, params.num_neighbors);
 
     if (target_points == nullptr) {
@@ -55,6 +55,6 @@ private:
 };
 
 static auto small_gicp_registry =
-  register_odometry("small_gicp", [](const OdometryEstimationParams& params) { return std::make_shared<SmallGICPOnlineOdometryEstimation>(params); });
+  register_odometry("small_gicp", [](const OdometryEstimationParams& params) { return boost::make_shared<SmallGICPOnlineOdometryEstimation>(params); });
 
 }  // namespace small_gicp

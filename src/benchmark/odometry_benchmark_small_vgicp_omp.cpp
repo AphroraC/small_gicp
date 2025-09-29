@@ -7,7 +7,7 @@
 #include <small_gicp/util/normal_estimation_omp.hpp>
 #include <small_gicp/registration/reduction_omp.hpp>
 #include <small_gicp/registration/registration.hpp>
-
+#include <boost/make_shared.hpp>
 namespace small_gicp {
 
 class SmallVGICPOnlineOdometryEstimationOMP : public OnlineOdometryEstimation {
@@ -18,10 +18,10 @@ public:
     Stopwatch sw;
     sw.start();
 
-    auto tree = std::make_shared<KdTree<PointCloud>>(points, KdTreeBuilderOMP(params.num_threads));
+    auto tree = boost::make_shared<KdTree<PointCloud>>(points, KdTreeBuilderOMP(params.num_threads));
     estimate_covariances_omp(*points, *tree, params.num_neighbors, params.num_threads);
 
-    auto voxelmap = std::make_shared<GaussianVoxelMap>(params.voxel_resolution);
+    auto voxelmap = boost::make_shared<GaussianVoxelMap>(params.voxel_resolution);
     voxelmap->insert(*points);
 
     if (target_points == nullptr) {
@@ -60,6 +60,6 @@ private:
 };
 
 static auto small_vgicp_omp_registry =
-  register_odometry("small_vgicp_omp", [](const OdometryEstimationParams& params) { return std::make_shared<SmallVGICPOnlineOdometryEstimationOMP>(params); });
+  register_odometry("small_vgicp_omp", [](const OdometryEstimationParams& params) { return boost::make_shared<SmallVGICPOnlineOdometryEstimationOMP>(params); });
 
 }  // namespace small_gicp

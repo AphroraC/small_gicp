@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024 Kenji Koide
 // SPDX-License-Identifier: MIT
 #pragma once
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <pcl/point_cloud.h>
 #include <pcl/registration/registration.h>
@@ -25,8 +27,8 @@ public:
   using PointCloudTargetPtr = typename PointCloudTarget::Ptr;
   using PointCloudTargetConstPtr = typename PointCloudTarget::ConstPtr;
 
-  using Ptr = pcl::shared_ptr<RegistrationPCL<PointSource, PointTarget>>;
-  using ConstPtr = pcl::shared_ptr<const RegistrationPCL<PointSource, PointTarget>>;
+  using Ptr = boost::shared_ptr<RegistrationPCL<PointSource, PointTarget>>;
+  using ConstPtr = boost::shared_ptr<const RegistrationPCL<PointSource, PointTarget>>;
 
 protected:
   using pcl::Registration<PointSource, PointTarget, Scalar>::reg_name_;
@@ -99,11 +101,11 @@ protected:
   std::string registration_type_;  ///< Registration type ("GICP" or "VGICP").
   bool verbose_;                   ///< Verbosity flag.
 
-  std::shared_ptr<small_gicp::KdTree<pcl::PointCloud<PointSource>>> target_tree_;  ///< KdTree for target point cloud.
-  std::shared_ptr<small_gicp::KdTree<pcl::PointCloud<PointSource>>> source_tree_;  ///< KdTree for source point cloud.
+  boost::shared_ptr<small_gicp::KdTree<pcl::PointCloud<PointSource>>> target_tree_;  ///< KdTree for target point cloud.
+  boost::shared_ptr<small_gicp::KdTree<pcl::PointCloud<PointSource>>> source_tree_;  ///< KdTree for source point cloud.
 
-  std::shared_ptr<GaussianVoxelMap> target_voxelmap_;  ///< VoxelMap for target point cloud.
-  std::shared_ptr<GaussianVoxelMap> source_voxelmap_;  ///< VoxelMap for source point cloud.
+  boost::shared_ptr<GaussianVoxelMap> target_voxelmap_;  ///< VoxelMap for target point cloud.
+  boost::shared_ptr<GaussianVoxelMap> source_voxelmap_;  ///< VoxelMap for source point cloud.
 
   std::vector<Eigen::Matrix4d> target_covs_;  ///< Covariances of target points
   std::vector<Eigen::Matrix4d> source_covs_;  ///< Covariances of source points.

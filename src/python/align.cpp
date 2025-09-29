@@ -15,7 +15,7 @@
 #include <small_gicp/registration/reduction_omp.hpp>
 #include <small_gicp/registration/registration.hpp>
 #include <small_gicp/registration/registration_helper.hpp>
-
+#include <boost/make_shared.hpp>
 namespace py = pybind11;
 using namespace small_gicp;
 
@@ -178,7 +178,7 @@ void define_align(py::module& m) {
       setting.verbose = verbose;
 
       if (target_tree == nullptr) {
-        target_tree = std::make_shared<KdTree<PointCloud>>(target, KdTreeBuilderOMP(num_threads));
+        target_tree = boost::make_shared<KdTree<PointCloud>>(target, KdTreeBuilderOMP(num_threads));
       }
       return align(*target, *source, *target_tree, Eigen::Isometry3d(init_T_target_source), setting);
     },
