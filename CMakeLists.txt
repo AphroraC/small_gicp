@@ -16,7 +16,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 # Build options
 option(BUILD_HELPER "Build helper library" ON)
 option(BUILD_TESTS "Build tests" OFF)
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(ENABLE_COVERAGE "Enable coverage" OFF)
@@ -28,6 +28,26 @@ option(BUILD_WITH_PCL "Build with PCL (required for benchmark and test only)" OF
 option(BUILD_WITH_FAST_GICP "Build with fast_gicp (required for benchmark and test only)" OFF)
 option(BUILD_WITH_IRIDESCENCE "Build with Iridescence (required for benchmark)" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
+option(BUILD_WITH_CATKIN "Build with CATKIN" ON)
+
+if(BUILD_WITH_CATKIN)
+    find_package(catkin REQUIRED)
+    link_directories(
+      ${catkin_LIBRARY_DIRS}
+      ${PCL_LIBRARY_DIRS}
+    )
+
+    catkin_package(
+      INCLUDE_DIRS include
+      LIBRARIES small_gicp
+    )
+
+    include_directories(
+      include
+      ${catkin_INCLUDE_DIRS}
+      ${PCL_INCLUDE_DIRS}
+    )
+endif()
 
 # Set mandatory dependencies of optional features
 if(BUILD_TESTS OR BUILD_EXAMPLES OR BUILD_BENCHMARKS)
@@ -74,8 +94,9 @@ if (BUILD_WITH_PCL)
     add_library(PCL::PCL INTERFACE IMPORTED)
     set_target_properties(PCL::PCL PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${PCL_INCLUDE_DIRS}"
-      INTERFACE_LINK_LIBRARIES "${PCL_LIBRARIES}"
     )
+    # 分别处理 PCL 库链接
+    target_link_libraries(PCL::PCL INTERFACE ${PCL_LIBRARIES})
   endif()
 endif()
 
@@ -124,7 +145,11 @@ endif()
 ## Build ##
 ###########
 
-include_directories(include)
+include_directories(
+  include
+  ${EIGEN3_INCLUDE_DIR}
+  ${PCL_INCLUDE_DIRS}
+)
 
 # Helper library
 if(BUILD_HELPER)
